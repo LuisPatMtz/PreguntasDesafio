@@ -13,10 +13,30 @@ const LoginRegistro = () => {
     alert("Login exitoso (simulado).")
   }
 
-  const handleRegister = (data) => {
-    console.log("Datos de registro:", data)
-    alert("Registro exitoso (simulado).")
-  }
+  const handleRegister = async (data) => {
+    try {
+      const response = await fetch('https://9juv31ubo1.execute-api.us-east-1.amazonaws.com/prod/registrarUsuario', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+  
+      const resultado = await response.json();
+  
+      if (response.ok) {
+        alert('✅ Registro exitoso: ' + resultado.mensaje);
+        console.log("Resultado de Lambda:", resultado);
+      } else {
+        alert('⚠️ Error: ' + (resultado.mensaje || 'No se pudo registrar.'));
+      }
+    } catch (error) {
+      console.error("Error al conectar con la API:", error);
+      alert("❌ Error de conexión con el servidor.");
+    }
+  };
+  
 
   return (
     <div className="login-container">
