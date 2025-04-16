@@ -1,5 +1,5 @@
 import React from 'react'
-import LoginRegistro from './pages/LoginRegistro'
+import LoginRegistro from './pages/AdminPage'
 
 function App() {
   return (

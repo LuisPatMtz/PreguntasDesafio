@@ -1,5 +1,5 @@
 .admin-panel {
-    background-image: url('/ruta/a/tu/fondo-jaguar.jpg');
+    background-image: url('/jaguar.jpg');
     background-size: cover;
     background-position: center;
     height: 100vh;
@@ -15,7 +15,7 @@
     padding: 2rem;
     display: flex;
     width: 90%;
-    max-width: 900px;
+    max-width: 1000px;
     justify-content: space-between;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
   }
