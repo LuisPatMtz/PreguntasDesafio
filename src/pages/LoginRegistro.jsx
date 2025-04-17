@@ -15,7 +15,7 @@ const LoginRegistro = () => {
 
   const handleRegister = async (data) => {
     try {
-      const response = await fetch('https://9juv31ubo1.execute-api.us-east-1.amazonaws.com/prod/registrarUsuario', {
+      const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/registrarUsuario', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
