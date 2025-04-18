@@ -1,0 +1,55 @@
+.materiaCard {
+    background: #ffffff;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: transform 0.2s ease;
+  }
+  
+  .materiaCard:hover {
+    transform: scale(1.02);
+  }
+  
+  .titulo {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  .progresoBarra {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .box {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  .rojo {
+    background-color: #dc3545;
+  }
+  
+  .amarillo {
+    background-color: #ffc107;
+  }
+  
+  .verde {
+    background-color: #28a745;
+  }
+  
+  .vacio {
+    background-color: #dee2e6;
+  }
+  
+  .porcentaje {
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
