@@ -1,11 +1,18 @@
 import React from 'react'
-import LoginRegistro from './pages/AdminPage'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import LoginRegistro from './pages/LoginRegistro'
+import AdminPage from './pages/AdminPage'
+import StudentPanel from './pages/StudentPanel'
 
 function App() {
   return (
-    <div>
-      <LoginRegistro />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LoginRegistro />} />
+        <Route path="/panel-admin" element={<AdminPage />} />
+        <Route path="/panel-estudiante/:matricula" element={<StudentPanel />} />
+      </Routes>
+    </Router>
   )
 }
 

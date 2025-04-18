@@ -1,29 +1,23 @@
-// src/components/RegistroForm.jsx
 import React, { useState } from 'react'
 
 const RegistroForm = ({ onRegister }) => {
   const [fullName, setFullName] = useState('')
   const [matricula, setMatricula] = useState('')
   const [semestre, setSemestre] = useState('')
-  const [docentePin, setDocentePin] = useState('')
   const [password, setPassword] = useState('')
   const [verifyPassword, setVerifyPassword] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    // Validación: matrícula de 9 dígitos
     const matriculaRegex = /^\d{9}$/
     if (!matriculaRegex.test(matricula)) {
-      alert('La matrícula debe contener 9 dígitos.')
+      alert('La matrícula debe contener exactamente 9 dígitos.')
       return
     }
+
     if (password !== verifyPassword) {
       alert('Las contraseñas no coinciden.')
-      return
-    }
-    if (semestre.toLowerCase() === 'docente' && docentePin.trim() === '') {
-      alert('Se requiere un pin de acceso para docentes.')
       return
     }
 
@@ -31,7 +25,7 @@ const RegistroForm = ({ onRegister }) => {
       fullName,
       matricula,
       semestre,
-      docentePin: semestre.toLowerCase() === 'docente' ? docentePin : null,
+      tipo_usuario: 'estudiante',
       password
     })
   }
@@ -48,6 +42,7 @@ const RegistroForm = ({ onRegister }) => {
           required
         />
       </div>
+
       <div className="mb-3">
         <label className="form-label">Matrícula (9 dígitos)</label>
         <input
@@ -60,6 +55,7 @@ const RegistroForm = ({ onRegister }) => {
           required
         />
       </div>
+
       <div className="mb-3">
         <label className="form-label">Semestre</label>
         <select
@@ -72,21 +68,9 @@ const RegistroForm = ({ onRegister }) => {
           <option value="2do">2do semestre</option>
           <option value="4to">4to semestre</option>
           <option value="6to">6to semestre</option>
-          <option value="docente">Docente</option>
         </select>
       </div>
-      {semestre.toLowerCase() === 'docente' && (
-        <div className="mb-3">
-          <label className="form-label">Pin de Acceso</label>
-          <input
-            type="password"
-            className="form-control"
-            value={docentePin}
-            onChange={(e) => setDocentePin(e.target.value)}
-            required
-          />
-        </div>
-      )}
+
       <div className="mb-3">
         <label className="form-label">Contraseña</label>
         <input
@@ -97,6 +81,7 @@ const RegistroForm = ({ onRegister }) => {
           required
         />
       </div>
+
       <div className="mb-4">
         <label className="form-label">Verificar Contraseña</label>
         <input
@@ -107,6 +92,7 @@ const RegistroForm = ({ onRegister }) => {
           required
         />
       </div>
+
       <button type="submit" className="btn btn-danger w-100">
         Registrarse
       </button>

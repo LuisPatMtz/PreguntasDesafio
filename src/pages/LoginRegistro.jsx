@@ -1,18 +1,51 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import LoginForm from '../components/LoginForm'
 import RegistroForm from '../components/RegistroForm'
-import '../styles/LoginRegistro.css'  // Importa estilos personalizados
+import '../styles/LoginRegistro.css'
 
 const LoginRegistro = () => {
   const [isLogin, setIsLogin] = useState(true)
-  
+  const navigate = useNavigate()
+
   const toggleForm = () => setIsLogin(!isLogin)
 
-  const handleLogin = (data) => {
-    console.log("Datos de login:", data)
-    alert("Login exitoso (simulado).")
+  // 🔐 LOGIN
+  const handleLogin = async (data) => {
+    try {
+      const response = await fetch('https://tu-api-id.execute-api.us-east-1.amazonaws.com/prod/verificarTipoUsuario', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          matricula: data.matricula,
+          contrasena: data.password
+        })
+      })
+
+      const resultado = await response.json()
+
+      if (response.ok) {
+        const tipo = resultado.tipo_usuario
+
+        if (tipo === 'admin') {
+          navigate('/panel-admin')
+        } else if (tipo === 'estudiante') {
+          navigate(`/panel-estudiante/${data.matricula}`)
+        } else {
+          alert('⚠️ Tipo de usuario no reconocido.')
+        }
+      } else {
+        alert('❌ Credenciales inválidas.')
+      }
+    } catch (err) {
+      console.error('Error al verificar usuario:', err)
+      alert('❌ Error al conectar con el servidor.')
+    }
   }
 
+  // 📝 REGISTRO
   const handleRegister = async (data) => {
     try {
       const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/registrarUsuario', {
@@ -20,23 +53,36 @@ const LoginRegistro = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
-      });
-  
-      const resultado = await response.json();
-  
+        body: JSON.stringify({
+          matricula: data.matricula,
+          fullName: data.fullName,
+          semestre: convertirSemestre(data.semestre),
+          contrasena: data.password
+        })
+      })
+
+      const resultado = await response.json()
+
       if (response.ok) {
-        alert('✅ Registro exitoso: ' + resultado.mensaje);
-        console.log("Resultado de Lambda:", resultado);
+        alert('✅ Registro exitoso: ' + resultado.mensaje)
+        setIsLogin(true)
       } else {
-        alert('⚠️ Error: ' + (resultado.mensaje || 'No se pudo registrar.'));
+        alert('⚠️ Error: ' + (resultado.error || 'No se pudo registrar.'))
       }
     } catch (error) {
-      console.error("Error al conectar con la API:", error);
-      alert("❌ Error de conexión con el servidor.");
+      console.error("Error al conectar con la API:", error)
+      alert("❌ Error de conexión con el servidor.")
     }
-  };
-  
+  }
+
+  const convertirSemestre = (s) => {
+    switch (s) {
+      case '2do': return 'Semestre 2'
+      case '4to': return 'Semestre 4'
+      case '6to': return 'Semestre 6'
+      default: return s
+    }
+  }
 
   return (
     <div className="login-container">
