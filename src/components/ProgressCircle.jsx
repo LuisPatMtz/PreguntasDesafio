@@ -1,5 +1,4 @@
-import React from 'react';
-import '../styles/ProgressCircle.css';
+import React from 'react'
 
 const ProgressCircle = ({ porcentaje }) => {
   const radio = 40
@@ -31,8 +30,14 @@ const ProgressCircle = ({ porcentaje }) => {
           strokeDasharray={circunferencia}
           strokeDashoffset={circunferencia - progreso}
           stroke={getStrokeColor()}
+          style={{ transition: 'stroke-dashoffset 0.5s ease' }}
         />
-        <text x="50" y="55" textAnchor="middle" className="circle-text">
+        <text
+          x="50"
+          y="55"
+          className="circle-text"
+          transform="rotate(90 50 50)"
+        >
           {porcentaje}%
         </text>
       </svg>

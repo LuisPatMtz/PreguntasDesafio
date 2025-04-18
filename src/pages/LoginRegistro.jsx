@@ -10,18 +10,14 @@ const LoginRegistro = () => {
 
   const toggleForm = () => setIsLogin(!isLogin)
 
-  // 🔐 LOGIN
-  const handleLogin = async (data) => {
+  const handleLogin = async ({ matricula, contrasena }) => {
     try {
       const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/verificarTipoUsuarioRDS', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          matricula: data.matricula,
-          contrasena: data.contrasena
-        })
+        body: JSON.stringify({ matricula, contrasena })
       })
 
       const resultado = await response.json()
@@ -32,7 +28,8 @@ const LoginRegistro = () => {
         if (tipo === 'admin') {
           navigate('/panel-admin')
         } else if (tipo === 'estudiante') {
-          navigate(`/panel-estudiante/${data.matricula}`)
+          localStorage.setItem('matricula', matricula) // ✅ guardar matrícula
+          navigate(`/panel-estudiante/${matricula}`)
         } else {
           alert('⚠️ Tipo de usuario no reconocido.')
         }
@@ -45,7 +42,6 @@ const LoginRegistro = () => {
     }
   }
 
-  // 📝 REGISTRO
   const handleRegister = async (data) => {
     try {
       const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/registrarUsuarioRDS', {

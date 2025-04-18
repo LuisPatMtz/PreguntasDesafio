@@ -1,14 +1,29 @@
+// src/pages/StudentPanel.jsx
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../styles/studentPanel.css'
+import Header from '../components/Header'
 import ProgressCircle from '../components/ProgressCircle'
+import MateriaCard from '../components/MateriaCard'
+import Sidebar from '../components/Sidebar'
+import Loader from '../components/Loader'
+import ErrorMessage from '../components/ErrorMessage'
 
 const StudentPanel = () => {
   const [materias, setMaterias] = useState([])
   const [porcentaje, setPorcentaje] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
+  const navigate = useNavigate()
   const matricula = localStorage.getItem('matricula')
 
   useEffect(() => {
+    if (!matricula) {
+      navigate('/')
+      return
+    }
+
     const fetchMaterias = async () => {
       try {
         const response = await fetch(
@@ -16,68 +31,62 @@ const StudentPanel = () => {
         )
         const data = await response.json()
 
-        const materiasConProgreso = data.map(materia => {
-          const progreso = Array.from({ length: 4 }).map((_, i) => {
+        if (!Array.isArray(data.materias)) {
+          throw new Error("Respuesta inesperada del servidor.")
+        }
+
+        const materiasConProgreso = data.materias.map(materia => ({
+          ...materia,
+          progreso: Array.from({ length: 4 }).map((_, i) => {
             if (i < materia.confirmadas) return true
             if (i < materia.total_preguntas) return false
-            return null // faltante
+            return null
           })
-          return { ...materia, progreso }
-        })
+        }))
 
         setMaterias(materiasConProgreso)
-
-        const total = 4 * data.length
-        const verificadas = data.reduce((acc, m) => acc + m.confirmadas, 0)
-        const porcentajeCalculado = Math.round((verificadas / total) * 100)
-        setPorcentaje(porcentajeCalculado)
-      } catch (error) {
-        console.error('Error al cargar progreso:', error)
+        setPorcentaje(data.progreso_general || 0)
+      } catch (err) {
+        console.error('❌ Error al cargar progreso:', err)
+        setError('No se pudo cargar el progreso del estudiante.')
+      } finally {
+        setLoading(false)
       }
     }
 
-    if (matricula) fetchMaterias()
-  }, [matricula])
+    fetchMaterias()
+  }, [matricula, navigate])
 
   return (
-    <div className="student-panel">
-      <aside className="sidebar">
-        <div className="sidebar-title">Página principal</div>
-        {materias.map((materia, idx) => (
-          <button key={idx} className="materia-button">
-            {materia.materia}
-          </button>
-        ))}
-      </aside>
+    <>
+      <Header />
+      <div className="student-panel">
+        <Sidebar materias={materias} />
 
-      <main className="panel-main">
-        <div className="progress-indicator">
-          <ProgressCircle percentage={porcentaje} />
-        </div>
+        <main className="panel-main">
+          {loading && <Loader />}
+          {error && <ErrorMessage mensaje={error} />}
 
-        <div className="materias-grid">
-          {materias.map((materia, idx) => (
-            <div className="materia-card" key={idx}>
-              <h5>{materia.materia}</h5>
-              <div className="barra-progreso">
-                {materia.progreso.map((estado, i) => (
-                  <div
-                    key={i}
-                    className={
-                      estado === true
-                        ? 'cuadro-verde'
-                        : estado === false
-                        ? 'cuadro-amarillo'
-                        : 'cuadro-rojo'
-                    }
-                  ></div>
+          {!loading && !error && (
+            <>
+              <div className="progress-indicator">
+                <ProgressCircle porcentaje={porcentaje} />
+              </div>
+
+              <div className="materias-grid">
+                {materias.map((materia, idx) => (
+                  <MateriaCard
+                    key={idx}
+                    nombre={materia.materia}
+                    progreso={materia.progreso}
+                  />
                 ))}
               </div>
-            </div>
-          ))}
-        </div>
-      </main>
-    </div>
+            </>
+          )}
+        </main>
+      </div>
+    </>
   )
 }
 
