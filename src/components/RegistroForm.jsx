@@ -24,9 +24,8 @@ const RegistroForm = ({ onRegister }) => {
     onRegister({
       fullName,
       matricula,
-      semestre,
-      tipo_usuario: 'estudiante',
-      password
+      semestre_id: parseInt(semestre),
+      contrasena: password
     })
   }
 

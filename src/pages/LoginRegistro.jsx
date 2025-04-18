@@ -48,7 +48,7 @@ const LoginRegistro = () => {
   // 📝 REGISTRO
   const handleRegister = async (data) => {
     try {
-      const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/registrarUsuario', {
+      const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/registrarUsuarioRDS', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -56,8 +56,8 @@ const LoginRegistro = () => {
         body: JSON.stringify({
           matricula: data.matricula,
           fullName: data.fullName,
-          semestre: convertirSemestre(data.semestre),
-          contrasena: data.password
+          semestre_id: data.semestre_id,
+          contrasena: data.contrasena
         })
       })
 
@@ -72,15 +72,6 @@ const LoginRegistro = () => {
     } catch (error) {
       console.error("Error al conectar con la API:", error)
       alert("❌ Error de conexión con el servidor.")
-    }
-  }
-
-  const convertirSemestre = (s) => {
-    switch (s) {
-      case '2do': return 'Semestre 2'
-      case '4to': return 'Semestre 4'
-      case '6to': return 'Semestre 6'
-      default: return s
     }
   }
 
