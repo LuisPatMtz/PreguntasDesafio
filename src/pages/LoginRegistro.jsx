@@ -13,7 +13,7 @@ const LoginRegistro = () => {
   // 🔐 LOGIN
   const handleLogin = async (data) => {
     try {
-      const response = await fetch('https://tu-api-id.execute-api.us-east-1.amazonaws.com/prod/verificarTipoUsuario', {
+      const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/verificarTipoUsuarioRDS', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

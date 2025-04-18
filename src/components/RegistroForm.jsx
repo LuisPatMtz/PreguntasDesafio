@@ -65,9 +65,9 @@ const RegistroForm = ({ onRegister }) => {
           required
         >
           <option value="">Seleccionar semestre</option>
-          <option value="2do">2do semestre</option>
-          <option value="4to">4to semestre</option>
-          <option value="6to">6to semestre</option>
+          <option value="2">2do semestre</option>
+          <option value="4">4to semestre</option>
+          <option value="6">6to semestre</option>
         </select>
       </div>
 
