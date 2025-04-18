@@ -3,11 +3,11 @@ import React, { useState } from 'react'
 
 const LoginForm = ({ onLogin }) => {
   const [matricula, setMatricula] = useState('')
-  const [password, setPassword] = useState('')
+  const [contrasena, setContrasena] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onLogin({ matricula, password })
+    onLogin({ matricula, contrasena })
   }
 
   return (
@@ -27,8 +27,8 @@ const LoginForm = ({ onLogin }) => {
         <input
           type="password"
           className="form-control"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={contrasena}
+          onChange={(e) => setContrasena(e.target.value)}
           required
         />
       </div>

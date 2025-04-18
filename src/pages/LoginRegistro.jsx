@@ -20,7 +20,7 @@ const LoginRegistro = () => {
         },
         body: JSON.stringify({
           matricula: data.matricula,
-          contrasena: data.password
+          contrasena: data.contrasena
         })
       })
 
