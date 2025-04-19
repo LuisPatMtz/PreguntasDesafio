@@ -1,20 +1,16 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
 
-const MateriaCard = ({ nombre, progreso }) => {
-  const navigate = useNavigate()
-
+const MateriaCard = ({ nombre, progreso, onCuadroClick }) => {
   const handleClick = (estado) => {
-    if (estado === null) {
-      localStorage.setItem('materia_seleccionada', nombre)
-      navigate('/agregar-pregunta')
+    if (estado === null && onCuadroClick) {
+      onCuadroClick(nombre)
     }
   }
 
   const getClassName = (estado) => {
     if (estado === true) return 'cuadro-verde'
     if (estado === false) return 'cuadro-amarillo'
-    return 'cuadro-rojo' // null va aquí
+    return 'cuadro-rojo'
   }
 
   return (
@@ -27,7 +23,7 @@ const MateriaCard = ({ nombre, progreso }) => {
             className={getClassName(estado)}
             onClick={() => handleClick(estado)}
             style={{ cursor: estado === null ? 'pointer' : 'default' }}
-            title={estado === null ? 'Haz clic para agregar una pregunta' : '' }
+            title={estado === null ? 'Haz clic para agregar una pregunta' : ''}
           ></div>
         ))}
       </div>

@@ -1,3 +1,4 @@
+// src/pages/AgregarPregunta.jsx
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
@@ -13,6 +14,8 @@ const AgregarPregunta = () => {
   const [error, setError] = useState(null)
   const [mostrarToast, setMostrarToast] = useState(false)
   const [materiaIdSeleccionada, setMateriaIdSeleccionada] = useState(null)
+  const [preguntas, setPreguntas] = useState([])
+
   const navigate = useNavigate()
   const matricula = localStorage.getItem('matricula')
   const materiaSeleccionada = localStorage.getItem('materia_seleccionada')
@@ -37,6 +40,7 @@ const AgregarPregunta = () => {
         const materiaEncontrada = data.materias.find(m => m.nombre === materiaSeleccionada)
         if (materiaEncontrada) {
           setMateriaIdSeleccionada(materiaEncontrada.id)
+          fetchPreguntas(materiaEncontrada.id)
         } else {
           setError('Materia no encontrada.')
         }
@@ -48,6 +52,16 @@ const AgregarPregunta = () => {
       }
     }
 
+    const fetchPreguntas = async (materiaId) => {
+      try {
+        const res = await fetch(`https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/obtenerPreguntasMateriaRDS?matricula=${matricula}&materia_id=${materiaId}`)
+        const data = await res.json()
+        setPreguntas(data.preguntas || [])
+      } catch (err) {
+        console.error('Error al cargar preguntas:', err)
+      }
+    }
+
     fetchMaterias()
   }, [matricula, navigate, materiaSeleccionada])
 
@@ -55,9 +69,7 @@ const AgregarPregunta = () => {
     try {
       const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/guardarPreguntaRDS', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pregunta)
       })
 
@@ -66,8 +78,8 @@ const AgregarPregunta = () => {
       if (response.ok) {
         setMostrarToast(true)
         setTimeout(() => {
-          navigate('/panel-estudiante')
-        }, 3000)
+          window.location.reload()
+        }, 2000)
       } else {
         alert(`⚠️ Error: ${resultado.error || 'No se pudo guardar la pregunta.'}`)
       }
@@ -82,7 +94,6 @@ const AgregarPregunta = () => {
       <Header />
       <div className="student-panel">
         <Sidebar materias={materias} />
-
         <main className="panel-main">
           {mostrarToast && (
             <div className="success-toast">
@@ -94,10 +105,31 @@ const AgregarPregunta = () => {
           {error && <ErrorMessage mensaje={error} />}
 
           {!loading && !error && materiaIdSeleccionada && (
-            <div className="formulario-pregunta">
-              <h2>Agregar nueva pregunta</h2>
-              <PreguntaForm materiaId={materiaIdSeleccionada} onSubmit={handleGuardarPregunta} />
-            </div>
+            <>
+              <h2>Preguntas realizadas</h2>
+              {preguntas.length > 0 ? (
+                <ul className="lista-preguntas">
+                  {preguntas.map(p => (
+                    <li key={p.id}>
+                      <strong>Enunciado:</strong> {p.enunciado}<br />
+                      <strong>Correcta:</strong> {p.opcion_correcta}<br />
+                      <strong>Justificación:</strong> {p.justificacion}<br />
+                      <strong>Estado:</strong> {p.confirmada ? '✅ Confirmada' : '⏳ Pendiente'}<br />
+                      <hr />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No hay preguntas realizadas.</p>
+              )}
+
+              {preguntas.length < 4 && (
+                <div className="formulario-pregunta">
+                  <h3>Agregar nueva pregunta</h3>
+                  <PreguntaForm materiaId={materiaIdSeleccionada} onSubmit={handleGuardarPregunta} />
+                </div>
+              )}
+            </>
           )}
         </main>
       </div>
