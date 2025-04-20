@@ -1,10 +1,8 @@
 // src/components/PreguntaForm.jsx
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import '../styles/preguntaForm.css'
 
-
-const PreguntaForm = ({ onSubmit }) => {
-  const [materiaId, setMateriaId] = useState(null)
+const PreguntaForm = ({ materiaId, onSubmit }) => {
   const [enunciado, setEnunciado] = useState('')
   const [opciones, setOpciones] = useState({
     incorrecta1: '',
@@ -16,36 +14,12 @@ const PreguntaForm = ({ onSubmit }) => {
   const [error, setError] = useState(null)
 
   const matricula = localStorage.getItem('matricula')
-  const materiaNombre = localStorage.getItem('materia_seleccionada')
-
-  useEffect(() => {
-    const fetchMateriaId = async () => {
-      try {
-        const res = await fetch(
-          `https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/obtenerMateriasPorSemestreRDS?matricula=${matricula}`
-        )
-        const data = await res.json()
-
-        const materia = data.materias.find(m => m.nombre === materiaNombre)
-        if (!materia) {
-          setError('Materia no encontrada')
-          return
-        }
-
-        setMateriaId(materia.id)
-      } catch (err) {
-        setError('Error al cargar la materia')
-      }
-    }
-
-    fetchMateriaId()
-  }, [materiaNombre, matricula])
 
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    if (!materiaId) {
-      setError('No se ha podido asociar la materia')
+    if (!materiaId || !matricula) {
+      setError('Faltan datos de materia o matrícula')
       return
     }
 
@@ -57,10 +31,10 @@ const PreguntaForm = ({ onSubmit }) => {
       opcion_incorrecta_2: opciones.incorrecta2,
       opcion_incorrecta_3: opciones.incorrecta3,
       opcion_correcta: opciones.correcta,
-      justificacion
+      justificacion,
     }
 
-    onSubmit(nuevaPregunta)
+    onSubmit?.(nuevaPregunta)
 
     // Limpiar campos
     setEnunciado('')

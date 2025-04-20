@@ -12,7 +12,8 @@ function App() {
         <Route path="/" element={<LoginRegistro />} />
         <Route path="/panel-admin" element={<AdminPage />} />
         <Route path="/panel-estudiante/:matricula" element={<StudentPanel />} />
-        <Route path="/agregar-pregunta" element={<AgregarPregunta />} /> 
+        <Route path="/agregar-pregunta/:matricula/:materia" element={<AgregarPregunta />} />
+
       </Routes>
     </Router>
   )

@@ -13,12 +13,12 @@ const AgregarPregunta = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [mostrarToast, setMostrarToast] = useState(false)
-  const [materiaIdSeleccionada, setMateriaIdSeleccionada] = useState(null)
+  const [materiaSeleccionada, setMateriaSeleccionada] = useState(null)
   const [preguntas, setPreguntas] = useState([])
 
   const navigate = useNavigate()
   const matricula = localStorage.getItem('matricula')
-  const materiaSeleccionada = localStorage.getItem('materia_seleccionada')
+  const nombreMateria = localStorage.getItem('materia_seleccionada')
 
   useEffect(() => {
     if (!matricula) {
@@ -26,27 +26,23 @@ const AgregarPregunta = () => {
       return
     }
 
-    const fetchMaterias = async () => {
+    const fetchMateriasYSeleccionada = async () => {
       try {
         const res = await fetch(`https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/obtenerMateriasPorSemestreRDS?matricula=${matricula}`)
         const data = await res.json()
 
-        if (!Array.isArray(data.materias)) {
-          throw new Error('Formato inesperado')
-        }
+        if (!Array.isArray(data.materias)) throw new Error('Formato inesperado')
 
         setMaterias(data.materias)
 
-        const materiaEncontrada = data.materias.find(m => m.nombre === materiaSeleccionada)
-        if (materiaEncontrada) {
-          setMateriaIdSeleccionada(materiaEncontrada.id)
-          fetchPreguntas(materiaEncontrada.id)
-        } else {
-          setError('Materia no encontrada.')
-        }
+        const encontrada = data.materias.find(m => m.nombre === nombreMateria)
+        if (!encontrada) throw new Error('Materia no encontrada.')
+
+        setMateriaSeleccionada(encontrada)
+        await fetchPreguntas(encontrada.id)
       } catch (err) {
-        console.error('Error al obtener materias:', err)
-        setError('No se pudieron cargar las materias.')
+        console.error('❌ Error:', err)
+        setError('No se pudieron cargar las materias o preguntas.')
       } finally {
         setLoading(false)
       }
@@ -58,33 +54,31 @@ const AgregarPregunta = () => {
         const data = await res.json()
         setPreguntas(data.preguntas || [])
       } catch (err) {
-        console.error('Error al cargar preguntas:', err)
+        console.error('❌ Error al obtener preguntas:', err)
       }
     }
 
-    fetchMaterias()
-  }, [matricula, navigate, materiaSeleccionada])
+    fetchMateriasYSeleccionada()
+  }, [matricula, navigate, nombreMateria])
 
   const handleGuardarPregunta = async (pregunta) => {
     try {
-      const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/guardarPreguntaRDS', {
+      const res = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/guardarPreguntaRDS', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pregunta)
       })
 
-      const resultado = await response.json()
+      const result = await res.json()
 
-      if (response.ok) {
+      if (res.ok) {
         setMostrarToast(true)
-        setTimeout(() => {
-          window.location.reload()
-        }, 2000)
+        setTimeout(() => window.location.reload(), 2000)
       } else {
-        alert(`⚠️ Error: ${resultado.error || 'No se pudo guardar la pregunta.'}`)
+        alert(`⚠️ Error: ${result.error || 'No se pudo guardar la pregunta.'}`)
       }
     } catch (err) {
-      console.error('❌ Error al guardar pregunta:', err)
+      console.error('❌ Error al guardar:', err)
       alert('❌ Ocurrió un error al conectar con el servidor.')
     }
   }
@@ -93,7 +87,11 @@ const AgregarPregunta = () => {
     <>
       <Header />
       <div className="student-panel">
-        <Sidebar materias={materias} />
+        <Sidebar
+          materias={materias}
+          materiaSeleccionada={materiaSeleccionada?.nombre}
+        />
+
         <main className="panel-main">
           {mostrarToast && (
             <div className="success-toast">
@@ -104,9 +102,10 @@ const AgregarPregunta = () => {
           {loading && <Loader />}
           {error && <ErrorMessage mensaje={error} />}
 
-          {!loading && !error && materiaIdSeleccionada && (
+          {!loading && !error && materiaSeleccionada && (
             <>
-              <h2>Preguntas realizadas</h2>
+              <h2>📘 Preguntas realizadas en {materiaSeleccionada.nombre}</h2>
+
               {preguntas.length > 0 ? (
                 <ul className="lista-preguntas">
                   {preguntas.map(p => (
@@ -114,7 +113,7 @@ const AgregarPregunta = () => {
                       <strong>Enunciado:</strong> {p.enunciado}<br />
                       <strong>Correcta:</strong> {p.opcion_correcta}<br />
                       <strong>Justificación:</strong> {p.justificacion}<br />
-                      <strong>Estado:</strong> {p.confirmada ? '✅ Confirmada' : '⏳ Pendiente'}<br />
+                      <strong>Estado:</strong> {p.confirmada ? '✅ Confirmada' : '⏳ Pendiente'}
                       <hr />
                     </li>
                   ))}
@@ -124,9 +123,12 @@ const AgregarPregunta = () => {
               )}
 
               {preguntas.length < 4 && (
-                <div className="formulario-pregunta">
-                  <h3>Agregar nueva pregunta</h3>
-                  <PreguntaForm materiaId={materiaIdSeleccionada} onSubmit={handleGuardarPregunta} />
+                <div className="formulario-pregunta" style={{ marginTop: '20px' }}>
+                  <h3>➕ Agregar nueva pregunta</h3>
+                  <PreguntaForm
+                    materiaId={materiaSeleccionada.id}
+                    onSubmit={handleGuardarPregunta}
+                  />
                 </div>
               )}
             </>

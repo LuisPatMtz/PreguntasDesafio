@@ -192,14 +192,16 @@
 }
 
 .materia-button.seleccionada {
-  background-color: #0d6efd;
+  background-color: #0d6efd !important;
   font-weight: bold;
+  color: white;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.4);
+}
+.materia-button:focus {
+  outline: none; /* ✅ Evita el borde azul del navegador */
 }
 
-.materia-button.seleccionada {
-  background-color: #0d6efd;
-  font-weight: bold;
-}
+
 /* ====== Modal del formulario de preguntas ====== */
 .formulario-overlay {
   position: fixed;

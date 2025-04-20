@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import '../styles/studentPanel.css'
 import Header from '../components/Header'
 import ProgressCircle from '../components/ProgressCircle'
@@ -10,6 +10,10 @@ import ErrorMessage from '../components/ErrorMessage'
 import PreguntaForm from '../components/PreguntaForm'
 
 const StudentPanel = () => {
+  const { matricula } = useParams()
+  const location = useLocation()
+  const navigate = useNavigate()
+
   const [materias, setMaterias] = useState([])
   const [porcentaje, setPorcentaje] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -17,10 +21,9 @@ const StudentPanel = () => {
   const [materiaSeleccionada, setMateriaSeleccionada] = useState(null)
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [toast, setToast] = useState(false)
-  const [materiaDesdeSidebar, setMateriaDesdeSidebar] = useState(false)
 
-  const navigate = useNavigate()
-  const matricula = localStorage.getItem('matricula')
+  // Determinar si estamos en la vista principal del estudiante
+  const enPaginaPrincipal = location.pathname === `/panel-estudiante/${matricula}`
 
   useEffect(() => {
     if (!matricula) {
@@ -67,21 +70,12 @@ const StudentPanel = () => {
     }
   }
 
-  const handleSeleccionMateria = (nombreMateria) => {
-    const materia = materias.find(m => m.materia === nombreMateria)
-    if (materia) {
-      setMateriaSeleccionada(materia)
-      setMostrarFormulario(false)
-      setMateriaDesdeSidebar(true)
-    }
-  }
-
   const handleClickProgreso = (nombreMateria) => {
     const materia = materias.find(m => m.materia === nombreMateria)
+    console.log('👉 Materia seleccionada:', materia)
     if (materia && materia.total_preguntas < 4) {
       setMateriaSeleccionada(materia)
       setMostrarFormulario(true)
-      setMateriaDesdeSidebar(false)
     }
   }
 
@@ -115,12 +109,11 @@ const StudentPanel = () => {
 
   return (
     <>
-      <Header onLogoClick={() => setMateriaSeleccionada(null)} />
+      <Header onLogoClick={() => navigate(`/panel-estudiante/${matricula}`)} />
       <div className="student-panel">
         <Sidebar
           materias={materias}
-          materiaSeleccionada={materiaDesdeSidebar ? materiaSeleccionada?.materia : ''}
-          onSeleccionar={handleSeleccionMateria}
+          materiaSeleccionada="" // no resaltar ninguna cuando estés en esta vista
         />
 
         <main className="panel-main">
@@ -128,7 +121,7 @@ const StudentPanel = () => {
           {loading && <Loader />}
           {error && <ErrorMessage mensaje={error} />}
 
-          {!loading && !error && (
+          {!loading && !error && enPaginaPrincipal && (
             <>
               <div className="progress-indicator">
                 <ProgressCircle porcentaje={porcentaje} />
@@ -144,38 +137,22 @@ const StudentPanel = () => {
                   />
                 ))}
               </div>
-
-              {materiaDesdeSidebar && materiaSeleccionada && (
-                <div style={{ marginTop: '30px', width: '100%' }}>
-                  <h3>{materiaSeleccionada.materia}</h3>
-                  <p>Aquí irán las preguntas hechas por el usuario (próximamente).</p>
-                  {materiaSeleccionada.total_preguntas < 4 && (
-                    <button
-                      className="btn-guardar"
-                      style={{ marginTop: '15px' }}
-                      onClick={() => setMostrarFormulario(true)}
-                    >
-                      ➕ Agregar pregunta
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {mostrarFormulario && materiaSeleccionada && (
-                <div className="formulario-overlay">
-                  <div className="formulario-contenido">
-                    <div className="formulario-header">
-                      <h4>Agregar pregunta a {materiaSeleccionada.materia}</h4>
-                      <button className="cerrar-modal" onClick={() => setMostrarFormulario(false)}>✖</button>
-                    </div>
-                    <PreguntaForm
-                      materiaId={materiaSeleccionada.id}
-                      onSubmit={handleGuardarPregunta}
-                    />
-                  </div>
-                </div>
-              )}
             </>
+          )}
+
+          {mostrarFormulario && materiaSeleccionada && (
+            <div className="formulario-overlay">
+              <div className="formulario-contenido">
+                <div className="formulario-header">
+                  <h4>Agregar pregunta a {materiaSeleccionada.materia}</h4>
+                  <button className="cerrar-modal" onClick={() => setMostrarFormulario(false)}>✖</button>
+                </div>
+                <PreguntaForm
+                  materiaId={materiaSeleccionada.id} // ✅ pasamos por prop
+                  onSubmit={handleGuardarPregunta}
+                />
+              </div>
+            </div>
           )}
         </main>
       </div>
