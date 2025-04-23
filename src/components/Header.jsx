@@ -3,19 +3,19 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../styles/Header.css'
 
-const Header = () => {
+const Header = ({ tipo = 'estudiante', nombre = '' }) => {
   const navigate = useNavigate()
   const matricula = localStorage.getItem('matricula')
 
   const handleLogout = () => {
-    localStorage.removeItem('matricula')
-    localStorage.removeItem('materia_seleccionada')
+    localStorage.clear()
     navigate('/')
   }
 
   const irAPrincipal = () => {
-    localStorage.removeItem('materia_seleccionada')
-    if (matricula) {
+    if (tipo === 'admin') {
+      navigate('/panel-admin')
+    } else if (matricula) {
       navigate(`/panel-estudiante/${matricula}`)
     } else {
       navigate('/')
@@ -24,12 +24,16 @@ const Header = () => {
 
   return (
     <header className="app-header">
-      <h4 className="logo-text" onClick={irAPrincipal} style={{ cursor: 'pointer' }}>
-        Desafío Jaguar
+      <h4 className="logo-text" onClick={irAPrincipal}>
+        Desafío Jaguar 🐆
       </h4>
-      <button className="logout-button" onClick={handleLogout}>
-        Cerrar sesión
-      </button>
+
+      <div className="header-right">
+        {nombre && <span className="user-name">👤 {nombre}</span>}
+        <button className="logout-button" onClick={handleLogout}>
+          Cerrar sesión
+        </button>
+      </div>
     </header>
   )
 }

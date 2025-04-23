@@ -1,0 +1,65 @@
+.confirmar-container {
+    padding: 2rem;
+  }
+  
+  .confirmar-container h2 {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    color: #212529;
+  }
+  
+  .materia-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .materia-summary {
+    font-weight: bold;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    background-color: #f1f1f1;
+    border-radius: 6px;
+  }
+  
+  .pregunta-table {
+    width: 100%;
+    margin-top: 1rem;
+    border-collapse: collapse;
+  }
+  
+  .pregunta-table th,
+  .pregunta-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .boton-confirmar {
+    padding: 0.4rem 0.8rem;
+    background-color: #198754;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 0.5rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  .boton-confirmar:hover {
+    background-color: #157347;
+  }
+  
+  .boton-rechazar {
+    padding: 0.4rem 0.8rem;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .boton-rechazar:hover {
+    background-color: #b02a37;
+  }
+  
