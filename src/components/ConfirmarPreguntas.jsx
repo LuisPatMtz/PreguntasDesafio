@@ -4,12 +4,9 @@ const ConfirmarPreguntas = () => {
   const [materias, setMaterias] = useState([])
   const [loading, setLoading] = useState(true)
 
-  // 🎯 Toast
   const [toastMessage, setToastMessage] = useState('')
   const [toastVisible, setToastVisible] = useState(false)
   const [toastError, setToastError] = useState(false)
-
-  // Mostrar toast
   const mostrarToast = (mensaje, error = false) => {
     setToastMessage(mensaje)
     setToastError(error)
@@ -105,7 +102,6 @@ const ConfirmarPreguntas = () => {
         </details>
       ))}
 
-      {/* ✅ Toast visual */}
       {toastVisible && (
         <div className={`toast ${toastVisible ? 'show' : ''} ${toastError ? 'error' : ''}`}>
           {toastMessage}

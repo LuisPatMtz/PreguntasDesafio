@@ -1,4 +1,3 @@
-// src/components/PreguntaForm.jsx
 import React, { useState } from 'react'
 import '../styles/preguntaForm.css'
 
@@ -36,7 +35,6 @@ const PreguntaForm = ({ materiaId, onSubmit }) => {
 
     onSubmit?.(nuevaPregunta)
 
-    // Limpiar campos
     setEnunciado('')
     setOpciones({
       incorrecta1: '',
