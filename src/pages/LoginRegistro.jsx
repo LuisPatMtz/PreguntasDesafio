@@ -25,7 +25,7 @@ const LoginRegistro = () => {
       if (response.ok) {
         const tipo = resultado.tipo_usuario
 
-        if (tipo === 'admin') {
+        if (tipo === 'docente') {
           navigate('/panel-admin')
         } else if (tipo === 'estudiante') {
           localStorage.setItem('matricula', matricula) // ✅ guardar matrícula

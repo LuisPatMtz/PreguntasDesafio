@@ -50,7 +50,7 @@ const AgregarPregunta = () => {
 
     const fetchPreguntas = async (materiaId) => {
       try {
-        const res = await fetch(`https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/obtenerPreguntasMateriaRDS?matricula=${matricula}&materia_id=${materiaId}`)
+        const res = await fetch(`https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/obtenerPreguntasPorMateriaRDS?matricula=${matricula}&materia_id=${materiaId}`)
         const data = await res.json()
         setPreguntas(data.preguntas || [])
       } catch (err) {
