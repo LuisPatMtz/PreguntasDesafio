@@ -1,0 +1,10 @@
+
+:root {
+  --color-primario: #b00020;
+  --color-secundario: #ffffff;
+  --color-fondo: #f8f9fa;
+  --color-sidebar: #2d2f33;
+  --color-texto: #212529;
+  --sombra: 0px 5px 15px rgba(0, 0, 0, 0.1);
+  --radio-borde: 1rem;
+}

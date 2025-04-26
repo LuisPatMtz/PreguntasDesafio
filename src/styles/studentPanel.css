@@ -256,3 +256,61 @@
 .cerrar-modal:hover {
   color: #a71d2a;
 }
+@media (max-width: 768px) {
+  .student-panel {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .sidebar-title {
+    width: 100%;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+
+  .materia-button {
+    flex: 1 1 45%;
+    margin: 5px;
+    font-size: 13px;
+    padding: 8px;
+    text-align: center;
+  }
+
+  .panel-main {
+    padding: 15px;
+    align-items: stretch;
+  }
+
+  .materias-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .materia-card {
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  .progress-indicator {
+    align-self: center;
+    margin-bottom: 10px;
+  }
+
+  .formulario-contenido {
+    width: 95%;
+    max-width: 95%;
+    padding: 18px;
+  }
+
+  .circle-text {
+    font-size: 0.9rem;
+  }
+}
