@@ -29,7 +29,7 @@ const LoginRegistro = () => {
           navigate('/panel-admin')
         } else if (tipo === 'estudiante') {
           localStorage.setItem('matricula', matricula) 
-          navigate(`/panel-estudiante/${matricula}`)
+          navigate(`/acciones-estudiante/${matricula}`)
         } else {
           alert('⚠️ Tipo de usuario no reconocido.')
         }

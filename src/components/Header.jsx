@@ -24,7 +24,7 @@ const Header = ({ tipo = 'estudiante', nombre = '' }) => {
   return (
     <header className="app-header">
       <h4 className="logo-text" onClick={irAPrincipal}>
-        Desafío Jaguar 🐆
+        Desafio jaguar
       </h4>
 
       <div className="header-right">

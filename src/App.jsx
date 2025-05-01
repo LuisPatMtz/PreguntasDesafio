@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import LoginRegistro from './pages/LoginRegistro'
+import AccionesEstudiante from './pages/AccionesEstudiante'
 import AdminPage from './pages/AdminPage'
 import StudentPanel from './pages/StudentPanel'
 import AgregarPregunta from './pages/AgregarPregunta' 
@@ -10,6 +11,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LoginRegistro />} />
+        <Route path="/acciones-estudiante/:matricula" element={<AccionesEstudiante />} />
         <Route path="/panel-admin" element={<AdminPage />} />
         <Route path="/panel-estudiante/:matricula" element={<StudentPanel />} />
         <Route path="/agregar-pregunta/:matricula/:materia" element={<AgregarPregunta />} />
