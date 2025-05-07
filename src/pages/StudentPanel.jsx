@@ -10,10 +10,11 @@ import ErrorMessage from '../components/ErrorMessage'
 import PreguntaForm from '../components/PreguntaForm'
 
 const StudentPanel = () => {
-  const { matricula } = useParams()
-  const location = useLocation()
+  const params = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
 
+  const [matricula, setMatricula] = useState(null)
   const [materias, setMaterias] = useState([])
   const [porcentaje, setPorcentaje] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -22,16 +23,28 @@ const StudentPanel = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [toast, setToast] = useState(false)
 
-  // Determinar si estamos en la vista principal del estudiante
-  const enPaginaPrincipal = location.pathname === `/panel-estudiante/${matricula}`
+  const enPaginaPrincipal = location.pathname === `/panel-estudiante` || location.pathname === `/panel-estudiante/${params?.matricula}`
 
+  // Obtener matrícula desde URL o localStorage
   useEffect(() => {
-    if (!matricula) {
+    const paramMatricula = params?.matricula
+    const localMatricula = localStorage.getItem('matricula')
+
+    if (paramMatricula) {
+      setMatricula(paramMatricula)
+    } else if (localMatricula) {
+      setMatricula(localMatricula)
+    } else {
+      alert('⚠️ Sesión expirada. Inicia sesión de nuevo.')
       navigate('/')
-      return
     }
+  }, [params, navigate])
+
+  // Cargar progreso del estudiante
+  useEffect(() => {
+    if (!matricula) return
     fetchMaterias()
-  }, [matricula, navigate])
+  }, [matricula])
 
   useEffect(() => {
     const escFunction = (e) => {
@@ -72,7 +85,6 @@ const StudentPanel = () => {
 
   const handleClickProgreso = (nombreMateria) => {
     const materia = materias.find(m => m.materia === nombreMateria)
-    console.log('👉 Materia seleccionada:', materia)
     if (materia && materia.total_preguntas < 4) {
       setMateriaSeleccionada(materia)
       setMostrarFormulario(true)
@@ -109,11 +121,12 @@ const StudentPanel = () => {
 
   return (
     <>
-      <Header onLogoClick={() => navigate(`/panel-estudiante/${matricula}`)} />
+      <Header onLogoClick={() => navigate('/panel-estudiante')} />
+
       <div className="student-panel">
         <Sidebar
           materias={materias}
-          materiaSeleccionada="" // no resaltar ninguna cuando estés en esta vista
+          materiaSeleccionada=""
         />
 
         <main className="panel-main">
@@ -148,7 +161,7 @@ const StudentPanel = () => {
                   <button className="cerrar-modal" onClick={() => setMostrarFormulario(false)}>✖</button>
                 </div>
                 <PreguntaForm
-                  materiaId={materiaSeleccionada.id} // ✅ pasamos por prop
+                  materiaId={materiaSeleccionada.id}
                   onSubmit={handleGuardarPregunta}
                 />
               </div>

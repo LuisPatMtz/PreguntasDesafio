@@ -25,11 +25,14 @@ const LoginRegistro = () => {
       if (response.ok) {
         const tipo = resultado.tipo_usuario
 
+        // Guarda datos en localStorage
+        localStorage.setItem('matricula', matricula)
+        localStorage.setItem('tipo_usuario', tipo)
+
         if (tipo === 'docente') {
           navigate('/panel-admin')
         } else if (tipo === 'estudiante') {
-          localStorage.setItem('matricula', matricula) 
-          navigate(`/acciones-estudiante/${matricula}`)
+          navigate('/acciones-estudiante')
         } else {
           alert('⚠️ Tipo de usuario no reconocido.')
         }
