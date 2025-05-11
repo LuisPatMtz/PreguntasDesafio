@@ -23,21 +23,17 @@ const LoginRegistro = () => {
       const resultado = await response.json()
 
       if (response.ok) {
-        const { tipo_usuario, nombre_completo, fullName, nombre } = resultado
-
-        // Elige el nombre real que venga y guárdalo
-        const nombreParaStorage =
-          nombre_completo || fullName || nombre || ''
+        const { tipo_usuario, nombre_completo } = resultado
 
         // Guarda datos en localStorage
         localStorage.setItem('matricula', matricula)
         localStorage.setItem('tipo_usuario', tipo_usuario)
-        localStorage.setItem('nombre_completo', nombreParaStorage)
+        localStorage.setItem('nombre_completo', nombre_completo || '')
 
         if (tipo_usuario === 'docente') {
-          navigate('/panel-admin')
+          navigate('/AdminPage')
         } else if (tipo_usuario === 'estudiante') {
-          // Redirige a AccionesEstudiante sin parámetros en la URL
+          // Redirige a AccionesEstudiante sin matrícula en la URL
           navigate('/acciones-estudiante')
         } else {
           alert('⚠️ Tipo de usuario no reconocido.')

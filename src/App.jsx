@@ -13,20 +13,17 @@ function App() {
         {/* Página inicial */}
         <Route path="/" element={<LoginRegistro />} />
 
-        {/* Acciones del estudiante */}
+        {/* Acciones del estudiante (sin matrícula en URL) */}
         <Route path="/acciones-estudiante" element={<AccionesEstudiante />} />
-        <Route path="/acciones-estudiante/:matricula" element={<AccionesEstudiante />} />
 
         {/* Panel del docente */}
-        <Route path="/panel-admin" element={<AdminPage />} />
+        <Route path="/AdminPage" element={<AdminPage />} />
 
-        {/* Panel del estudiante */}
+        {/* Panel del estudiante (sin matrícula en URL) */}
         <Route path="/panel-estudiante" element={<StudentPanel />} />
-        <Route path="/panel-estudiante/:matricula" element={<StudentPanel />} />
 
-        {/* Agregar preguntas */}
+        {/* Agregar preguntas: sólo materia en la ruta */}
         <Route path="/agregar-pregunta/:materia" element={<AgregarPregunta />} />
-        <Route path="/agregar-pregunta/:matricula/:materia" element={<AgregarPregunta />} />
       </Routes>
     </Router>
   )
