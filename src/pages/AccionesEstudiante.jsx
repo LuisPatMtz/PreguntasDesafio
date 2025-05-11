@@ -28,7 +28,7 @@ const AccionesEstudiante = () => {
     if (!matricula) return
 
     // Obtener nombre del estudiante
-    fetch(`https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/obtenerUsuarioRDSs?matricula=${matricula}`)
+    fetch(`https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/obtenerUsuarioRDS?matricula=${matricula}`)
       .then(res => res.json())
       .then(data => {
         if (data.nombre_completo) setNombre(data.nombre_completo)

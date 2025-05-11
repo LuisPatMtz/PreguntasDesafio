@@ -12,26 +12,32 @@ const LoginRegistro = () => {
 
   const handleLogin = async ({ matricula, contrasena }) => {
     try {
-      const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/verificarTipoUsuarioRDS', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ matricula, contrasena })
-      })
-
+      const response = await fetch(
+        'https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/verificarTipoUsuarioRDS',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ matricula, contrasena })
+        }
+      )
       const resultado = await response.json()
 
       if (response.ok) {
-        const tipo = resultado.tipo_usuario
+        const { tipo_usuario, nombre_completo, fullName, nombre } = resultado
+
+        // Elige el nombre real que venga y guárdalo
+        const nombreParaStorage =
+          nombre_completo || fullName || nombre || ''
 
         // Guarda datos en localStorage
         localStorage.setItem('matricula', matricula)
-        localStorage.setItem('tipo_usuario', tipo)
+        localStorage.setItem('tipo_usuario', tipo_usuario)
+        localStorage.setItem('nombre_completo', nombreParaStorage)
 
-        if (tipo === 'docente') {
+        if (tipo_usuario === 'docente') {
           navigate('/panel-admin')
-        } else if (tipo === 'estudiante') {
+        } else if (tipo_usuario === 'estudiante') {
+          // Redirige a AccionesEstudiante sin parámetros en la URL
           navigate('/acciones-estudiante')
         } else {
           alert('⚠️ Tipo de usuario no reconocido.')
@@ -47,19 +53,19 @@ const LoginRegistro = () => {
 
   const handleRegister = async (data) => {
     try {
-      const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/registrarUsuarioRDS', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          matricula: data.matricula,
-          fullName: data.fullName,
-          semestre_id: data.semestre_id,
-          contrasena: data.contrasena
-        })
-      })
-
+      const response = await fetch(
+        'https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/registrarUsuarioRDS',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            matricula: data.matricula,
+            fullName: data.fullName,
+            semestre_id: data.semestre_id,
+            contrasena: data.contrasena
+          })
+        }
+      )
       const resultado = await response.json()
 
       if (response.ok) {
@@ -69,8 +75,8 @@ const LoginRegistro = () => {
         alert('⚠️ Error: ' + (resultado.error || 'No se pudo registrar.'))
       }
     } catch (error) {
-      console.error("Error al conectar con la API:", error)
-      alert("❌ Error de conexión con el servidor.")
+      console.error('Error al conectar con la API:', error)
+      alert('❌ Error de conexión con el servidor.')
     }
   }
 
@@ -81,13 +87,17 @@ const LoginRegistro = () => {
         <div className="d-flex mb-3">
           <button
             onClick={() => setIsLogin(true)}
-            className={`btn ${isLogin ? 'btn-danger text-white' : 'btn-light text-danger'} flex-fill`}
+            className={`btn ${
+              isLogin ? 'btn-danger text-white' : 'btn-light text-danger'
+            } flex-fill`}
           >
             Iniciar sesión
           </button>
           <button
             onClick={toggleForm}
-            className={`btn ${!isLogin ? 'btn-danger text-white' : 'btn-light text-danger'} flex-fill`}
+            className={`btn ${
+              !isLogin ? 'btn-danger text-white' : 'btn-light text-danger'
+            } flex-fill`}
           >
             Registrar
           </button>
