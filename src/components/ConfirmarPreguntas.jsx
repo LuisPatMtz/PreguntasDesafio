@@ -73,6 +73,7 @@ const ConfirmarPreguntas = () => {
               <thead>
                 <tr>
                   <th>Enunciado</th>
+                  <th>Respuesta</th>
                   <th>Justificación</th>
                   <th>Autor</th>
                   <th>Acciones</th>
@@ -82,6 +83,7 @@ const ConfirmarPreguntas = () => {
                 {materia.preguntas.map(pregunta => (
                   <tr key={pregunta.id}>
                     <td>{pregunta.enunciado}</td>
+                    <td>{pregunta.opcion_correcta}</td>
                     <td>{pregunta.justificacion}</td>
                     <td>{pregunta.autor}</td>
                     <td>
