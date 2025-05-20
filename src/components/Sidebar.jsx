@@ -3,26 +3,25 @@ import { useNavigate } from 'react-router-dom'
 
 const Sidebar = ({ materias, materiaSeleccionada }) => {
   const navigate = useNavigate()
-  const matricula = localStorage.getItem('matricula')
 
   const handleClick = (nombreMateria) => {
+    // guardamos en localStorage (opcional, puedes prescindir de eso)
     localStorage.setItem('materia_seleccionada', nombreMateria)
-    if (matricula) {
-      navigate(`/agregar-pregunta/${matricula}/${encodeURIComponent(nombreMateria)}`)
-    } else {
-      navigate('/')
-    }
+    // navegamos solo con la materia
+    navigate(`/agregar-pregunta/${encodeURIComponent(nombreMateria)}`)
   }
 
   return (
     <aside className="sidebar">
       <div className="sidebar-title">Materias</div>
-      {materias.map((materia, idx) => {
-        const nombre = materia.nombre || materia.materia
+      {materias.map((m, idx) => {
+        const nombre = m.nombre || m.materia
         return (
           <button
             key={idx}
-            className={`materia-button ${nombre === materiaSeleccionada ? 'seleccionada' : ''}`}
+            className={`materia-button ${
+              nombre === materiaSeleccionada ? 'seleccionada' : ''
+            }`}
             onClick={() => handleClick(nombre)}
           >
             {nombre}

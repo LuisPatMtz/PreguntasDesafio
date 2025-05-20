@@ -20,30 +20,35 @@ const LoginRegistro = () => {
           body: JSON.stringify({ matricula, contrasena })
         }
       )
-      const resultado = await response.json()
 
-      if (response.ok) {
-        const { tipo_usuario, nombre_completo } = resultado
+      if (response.status === 401) {
+        alert('⚠️ Credenciales inválidas')
+        return
+      }
+      if (!response.ok) {
+        alert('❌ Error al conectar con el servidor')
+        return
+      }
 
-        // Guarda datos en localStorage
-        localStorage.setItem('matricula', matricula)
-        localStorage.setItem('tipo_usuario', tipo_usuario)
-        localStorage.setItem('nombre_completo', nombre_completo || '')
+      const { token, tipo_usuario, nombre_completo } = await response.json()
 
-        if (tipo_usuario === 'docente') {
-          navigate('/AdminPage')
-        } else if (tipo_usuario === 'estudiante') {
-          // Redirige a AccionesEstudiante sin matrícula en la URL
-          navigate('/acciones-estudiante')
-        } else {
-          alert('⚠️ Tipo de usuario no reconocido.')
-        }
+      // Guardar token y datos en localStorage
+      localStorage.setItem('jwt', token)
+      localStorage.setItem('matricula', matricula)
+      localStorage.setItem('tipo_usuario', tipo_usuario)
+      localStorage.setItem('nombre_completo', nombre_completo || '')
+
+      // Redirigir según rol
+      if (tipo_usuario === 'docente') {
+        navigate('/AdminPage')
+      } else if (tipo_usuario === 'estudiante') {
+        navigate('/acciones-estudiante')
       } else {
-        alert('❌ Credenciales inválidas.')
+        alert('⚠️ Tipo de usuario no reconocido.')
       }
     } catch (err) {
       console.error('Error al verificar usuario:', err)
-      alert('❌ Error al conectar con el servidor.')
+      alert('❌ Error de red. Por favor, inténtalo de nuevo.')
     }
   }
 
@@ -65,7 +70,7 @@ const LoginRegistro = () => {
       const resultado = await response.json()
 
       if (response.ok) {
-        alert('✅ Registro exitoso: ' + resultado.mensaje)
+        alert('✅ ¡Registro exitoso! Bienvenido al Desafío Jaguar.')
         setIsLogin(true)
       } else {
         alert('⚠️ Error: ' + (resultado.error || 'No se pudo registrar.'))

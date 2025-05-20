@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import Header from '../components/Header'
 import Loader from '../components/Loader'
@@ -8,6 +8,10 @@ import PreguntaForm from '../components/PreguntaForm'
 import '../styles/SuccessToast.css'
 
 const AgregarPregunta = () => {
+  const { materia } = useParams()                         // <-- materia viene de la URL
+  const nombreMateria = decodeURIComponent(materia)        // <-- Deskapea espacios
+  const matricula = localStorage.getItem('matricula')     // <-- matrícula siempre de localStorage
+
   const [materias, setMaterias] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -16,8 +20,6 @@ const AgregarPregunta = () => {
   const [preguntas, setPreguntas] = useState([])
 
   const navigate = useNavigate()
-  const matricula = localStorage.getItem('matricula')
-  const nombreMateria = localStorage.getItem('materia_seleccionada')
 
   useEffect(() => {
     if (!matricula) {
@@ -25,59 +27,64 @@ const AgregarPregunta = () => {
       return
     }
 
-    const fetchMateriasYSeleccionada = async () => {
+    const cargarDatos = async () => {
       try {
-        const res = await fetch(`https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/obtenerMateriasPorSemestreRDS?matricula=${matricula}`)
-        const data = await res.json()
+        // 1) Obtiene todas las materias
+        const resM = await fetch(
+          `https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/obtenerMateriasPorSemestreRDS?matricula=${matricula}`
+        )
+        if (!resM.ok) throw new Error('Error al cargar materias')
+        const dataM = await resM.json()
+        if (!Array.isArray(dataM.materias)) throw new Error('Respuesta inesperada')
+        setMaterias(dataM.materias)
 
-        if (!Array.isArray(data.materias)) throw new Error('Formato inesperado')
-
-        setMaterias(data.materias)
-
-        const encontrada = data.materias.find(m => m.nombre === nombreMateria)
-        if (!encontrada) throw new Error('Materia no encontrada.')
-
+        // 2) Busca la materia seleccionada por su nombre
+        const encontrada = dataM.materias.find((m) => m.nombre === nombreMateria)
+        if (!encontrada) throw new Error('Materia no encontrada')
         setMateriaSeleccionada(encontrada)
-        await fetchPreguntas(encontrada.id)
+
+        // 3) Carga las preguntas de esa materia
+        const resP = await fetch(
+          `https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/obtenerPreguntasPorMateriaRDS?matricula=${matricula}&materia_id=${encontrada.id}`
+        )
+        if (!resP.ok) throw new Error('Error al cargar preguntas')
+        const dataP = await resP.json()
+        setPreguntas(Array.isArray(dataP.preguntas) ? dataP.preguntas : [])
       } catch (err) {
-        console.error('❌ Error:', err)
-        setError('No se pudieron cargar las materias o preguntas.')
+        console.error(err)
+        setError('No se pudieron cargar materias o preguntas.')
       } finally {
         setLoading(false)
       }
     }
 
-    const fetchPreguntas = async (materiaId) => {
-      try {
-        const res = await fetch(`https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/obtenerPreguntasPorMateriaRDS?matricula=${matricula}&materia_id=${materiaId}`)
-        const data = await res.json()
-        setPreguntas(data.preguntas || [])
-      } catch (err) {
-        console.error('❌ Error al obtener preguntas:', err)
-      }
-    }
-
-    fetchMateriasYSeleccionada()
-  }, [matricula, navigate, nombreMateria])
+    cargarDatos()
+  }, [matricula, nombreMateria, navigate])
 
   const handleGuardarPregunta = async (pregunta) => {
     try {
-      const res = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/guardarPreguntaRDS', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(pregunta)
-      })
-
+      const res = await fetch(
+        'https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/guardarPreguntaRDS',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(pregunta)
+        }
+      )
       const result = await res.json()
 
-      if (res.ok) {
-        setMostrarToast(true)
-        setTimeout(() => window.location.reload(), 2000)
-      } else {
+      if (!res.ok) {
         alert(`⚠️ Error: ${result.error || 'No se pudo guardar la pregunta.'}`)
+        return
       }
+
+      setMostrarToast(true)
+      setTimeout(() => {
+        // recarga solo preguntas
+        window.location.reload()
+      }, 2000)
     } catch (err) {
-      console.error('❌ Error al guardar:', err)
+      console.error(err)
       alert('❌ Ocurrió un error al conectar con el servidor.')
     }
   }
@@ -93,26 +100,27 @@ const AgregarPregunta = () => {
 
         <main className="panel-main">
           {mostrarToast && (
-            <div className="success-toast">
-              ✅ Pregunta guardada con éxito
-            </div>
+            <div className="success-toast">✅ Pregunta guardada con éxito</div>
           )}
-
           {loading && <Loader />}
           {error && <ErrorMessage mensaje={error} />}
 
           {!loading && !error && materiaSeleccionada && (
             <>
-              <h2>📘 Preguntas realizadas en {materiaSeleccionada.nombre}</h2>
+              <h2>📘 Preguntas en {materiaSeleccionada.nombre}</h2>
 
               {preguntas.length > 0 ? (
                 <ul className="lista-preguntas">
-                  {preguntas.map(p => (
+                  {preguntas.map((p) => (
                     <li key={p.id}>
-                      <strong>Enunciado:</strong> {p.enunciado}<br />
-                      <strong>Correcta:</strong> {p.opcion_correcta}<br />
-                      <strong>Justificación:</strong> {p.justificacion}<br />
-                      <strong>Estado:</strong> {p.confirmada ? '✅ Confirmada' : '⏳ Pendiente'}
+                      <strong>Enunciado:</strong> {p.enunciado}
+                      <br />
+                      <strong>Correcta:</strong> {p.opcion_correcta}
+                      <br />
+                      <strong>Justificación:</strong> {p.justificacion}
+                      <br />
+                      <strong>Estado:</strong>{' '}
+                      {p.confirmada ? '✅ Confirmada' : '⏳ Pendiente'}
                       <hr />
                     </li>
                   ))}
@@ -122,7 +130,7 @@ const AgregarPregunta = () => {
               )}
 
               {preguntas.length < 4 && (
-                <div className="formulario-pregunta" style={{ marginTop: '20px' }}>
+                <div className="formulario-pregunta" style={{ marginTop: 20 }}>
                   <h3>➕ Agregar nueva pregunta</h3>
                   <PreguntaForm
                     materiaId={materiaSeleccionada.id}

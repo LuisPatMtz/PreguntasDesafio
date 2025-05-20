@@ -23,48 +23,48 @@ const StudentPanel = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [toast, setToast] = useState(false)
 
-  const enPaginaPrincipal = location.pathname === `/panel-estudiante` || location.pathname === `/panel-estudiante/${params?.matricula}`
+  // Determina si estamos en la vista principal
+  const enPaginaPrincipal =
+    location.pathname === '/panel-estudiante' ||
+    location.pathname === `/panel-estudiante/${params?.materia}`
 
   // Obtener matrícula desde URL o localStorage
   useEffect(() => {
-    const paramMatricula = params?.matricula
-    const localMatricula = localStorage.getItem('matricula')
-
-    if (paramMatricula) {
-      setMatricula(paramMatricula)
-    } else if (localMatricula) {
-      setMatricula(localMatricula)
+    const urlMat = params?.matricula || params?.materia
+    const stored = localStorage.getItem('matricula')
+    if (urlMat) {
+      setMatricula(urlMat)
+    } else if (stored) {
+      setMatricula(stored)
     } else {
       alert('⚠️ Sesión expirada. Inicia sesión de nuevo.')
       navigate('/')
     }
   }, [params, navigate])
 
-  // Cargar progreso del estudiante
+  // Cargar progreso cuando haya matrícula
   useEffect(() => {
-    if (!matricula) return
-    fetchMaterias()
+    if (matricula) fetchMaterias()
   }, [matricula])
 
+  // Escape cierra formulario
   useEffect(() => {
-    const escFunction = (e) => {
-      if (e.key === 'Escape') setMostrarFormulario(false)
-    }
-    document.addEventListener('keydown', escFunction)
-    return () => document.removeEventListener('keydown', escFunction)
+    const onEsc = (e) => e.key === 'Escape' && setMostrarFormulario(false)
+    document.addEventListener('keydown', onEsc)
+    return () => document.removeEventListener('keydown', onEsc)
   }, [])
 
   const fetchMaterias = async () => {
     setLoading(true)
+    setError(null)
     try {
-      const response = await fetch(
+      const res = await fetch(
         `https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/obtenerProgresoEstudianteRDS?matricula=${matricula}`
       )
-      const data = await response.json()
-
+      if (!res.ok) throw new Error('Error al cargar progreso')
+      const data = await res.json()
       if (!Array.isArray(data.materias)) throw new Error('Respuesta inesperada')
-
-      const materiasConProgreso = data.materias.map(m => ({
+      const list = data.materias.map((m) => ({
         ...m,
         progreso: Array.from({ length: 4 }).map((_, i) => {
           if (i < m.confirmadas) return true
@@ -72,28 +72,31 @@ const StudentPanel = () => {
           return null
         })
       }))
-
-      setMaterias(materiasConProgreso)
+      setMaterias(list)
       setPorcentaje(data.progreso_general || 0)
-    } catch (err) {
-      console.error('❌ Error:', err)
+    } catch (e) {
+      console.error(e)
       setError('No se pudo cargar el progreso del estudiante.')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleClickProgreso = (nombreMateria) => {
-    const materia = materias.find(m => m.materia === nombreMateria)
-    if (materia && materia.total_preguntas < 4) {
-      setMateriaSeleccionada(materia)
-      setMostrarFormulario(true)
+  // Al hacer click en sidebar o en tarjeta, selecciona materia
+  const handleSelectMateria = (nombre) => {
+    const sel = materias.find((m) => m.materia === nombre)
+    if (!sel) {
+      console.warn('Materia no encontrada:', nombre)
+      return
     }
+    setMateriaSeleccionada(sel)
+    // solo abrir formulario si faltan preguntas
+    if (sel.total_preguntas < 4) setMostrarFormulario(true)
   }
 
   const handleGuardarPregunta = async (nuevaPregunta) => {
     try {
-      const response = await fetch(
+      const res = await fetch(
         'https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/guardarPreguntaRDS',
         {
           method: 'POST',
@@ -101,64 +104,64 @@ const StudentPanel = () => {
           body: JSON.stringify(nuevaPregunta)
         }
       )
-
-      if (response.ok) {
-        setToast(true)
-        setTimeout(() => {
-          setToast(false)
-          setMostrarFormulario(false)
-          fetchMaterias()
-        }, 2000)
-      } else {
-        const err = await response.json()
+      if (!res.ok) {
+        const err = await res.json()
         alert('⚠️ Error: ' + (err.error || 'No se pudo guardar'))
+        return
       }
-    } catch (err) {
+      setToast(true)
+      setTimeout(() => {
+        setToast(false)
+        setMostrarFormulario(false)
+        fetchMaterias()
+      }, 2000)
+    } catch (e) {
+      console.error(e)
       alert('❌ Error al guardar la pregunta')
-      console.error(err)
     }
   }
 
   return (
     <>
       <Header onLogoClick={() => navigate('/panel-estudiante')} />
-
       <div className="student-panel">
         <Sidebar
           materias={materias}
-          materiaSeleccionada=""
+          materiaSeleccionada={materiaSeleccionada?.materia || ''}
+          onSelect={handleSelectMateria}
         />
-
         <main className="panel-main">
           {toast && <div className="success-toast">✅ Pregunta guardada correctamente</div>}
           {loading && <Loader />}
           {error && <ErrorMessage mensaje={error} />}
-
           {!loading && !error && enPaginaPrincipal && (
             <>
               <div className="progress-indicator">
                 <ProgressCircle porcentaje={porcentaje} />
               </div>
-
               <div className="materias-grid">
-                {materias.map((materia, idx) => (
+                {materias.map((m, i) => (
                   <MateriaCard
-                    key={idx}
-                    nombre={materia.materia}
-                    progreso={materia.progreso}
-                    onCuadroClick={() => handleClickProgreso(materia.materia)}
+                    key={i}
+                    nombre={m.materia}
+                    progreso={m.progreso}
+                    onCuadroClick={() => handleSelectMateria(m.materia)}
                   />
                 ))}
               </div>
             </>
           )}
-
           {mostrarFormulario && materiaSeleccionada && (
             <div className="formulario-overlay">
               <div className="formulario-contenido">
                 <div className="formulario-header">
                   <h4>Agregar pregunta a {materiaSeleccionada.materia}</h4>
-                  <button className="cerrar-modal" onClick={() => setMostrarFormulario(false)}>✖</button>
+                  <button
+                    className="cerrar-modal"
+                    onClick={() => setMostrarFormulario(false)}
+                  >
+                    ✖
+                  </button>
                 </div>
                 <PreguntaForm
                   materiaId={materiaSeleccionada.id}

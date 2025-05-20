@@ -11,14 +11,14 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LoginRegistro />} />
-
         <Route path="/acciones-estudiante" element={<AccionesEstudiante />} />
-
         <Route path="/AdminPage" element={<AdminPage />} />
-
         <Route path="/panel-estudiante" element={<StudentPanel />} />
-
-        <Route path="/agregar-pregunta/:materia" element={<AgregarPregunta />} />
+        {/* Sólo materia en la URL */}
+        <Route
+          path="/agregar-pregunta/:materia"
+          element={<AgregarPregunta />}
+        />
       </Routes>
     </Router>
   )
