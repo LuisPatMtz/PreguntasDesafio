@@ -36,7 +36,7 @@ const AccionesEstudiante = () => {
       .catch(err => console.error('Error al obtener nombre:', err))
 
     // Verificar asistencia
-    fetch(`https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/verificarAsistenciaRDSs?matricula=${matricula}`)
+    fetch(`https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/verificarAsistenciaRDS?matricula=${matricula}`)
       .then(res => res.json())
       .then(data => {
         if (data.asistencia_confirmada) setAsistenciaConfirmada(true)
@@ -46,7 +46,7 @@ const AccionesEstudiante = () => {
 
   const confirmarAsistencia = async () => {
     try {
-      const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/confirmarAsistenciaRDSss', {
+      const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/confirmarAsistenciaRDS', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ matricula })
