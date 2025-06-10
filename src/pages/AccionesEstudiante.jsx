@@ -46,7 +46,7 @@ const AccionesEstudiante = () => {
 
   const confirmarAsistencia = async () => {
     try {
-      const response = await fetch('https://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/confirmarAsistenciaRDS', {
+      const response = await fetch('aunnohttps://v62mxrdy3g.execute-api.us-east-1.amazonaws.com/prod/confirmarAsistenciaRDS', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ matricula })
