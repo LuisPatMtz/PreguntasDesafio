@@ -22,11 +22,11 @@ const LoginRegistro = () => {
       )
 
       if (response.status === 401) {
-        alert('⚠️ Credenciales inválidas')
+        alert('Credenciales inválidas')
         return
       }
       if (!response.ok) {
-        alert('❌ Error al conectar con el servidor')
+        alert('Error al conectar con el servidor')
         return
       }
 
@@ -70,10 +70,10 @@ const LoginRegistro = () => {
       const resultado = await response.json()
 
       if (response.ok) {
-        alert('✅ ¡Registro exitoso! Bienvenido al Desafío Jaguar.')
+        alert('Se a registrado correctamente. Ahora puedes iniciar sesión.')
         setIsLogin(true)
       } else {
-        alert('⚠️ Error: ' + (resultado.error || 'No se pudo registrar.'))
+        alert('Error: ' + (resultado.error || 'No se pudo registrar.'))
       }
     } catch (error) {
       console.error('Error al conectar con la API:', error)

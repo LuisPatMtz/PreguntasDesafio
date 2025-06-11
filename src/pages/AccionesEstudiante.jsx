@@ -55,7 +55,7 @@ const AccionesEstudiante = () => {
       const result = await response.json()
 
       if (response.ok) {
-        alert('✅ Asistencia confirmada')
+        alert('Asistencia confirmada :]')
         setAsistenciaConfirmada(true)
       } else {
         alert(`⚠️ Error: ${result.error || 'No se pudo confirmar la asistencia'}`)
@@ -75,7 +75,7 @@ const AccionesEstudiante = () => {
 
         <div className="acciones-card animate-fade-slide">
           <h3 className="bienvenida">¡Bienvenido{nombre && `, ${nombre}`}! 👋</h3>
-          <h2>¿Qué deseas hacer?</h2>
+          <h2>¿Que deseas hacer?</h2>
 
           <div className="acciones-botones">
             <button
